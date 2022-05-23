@@ -168,34 +168,6 @@ def __find_bandwidth(incl_len):  # incl_len é o tamanho do pacote
     return bandwidth
 
 
-def __find_nsamples_max(pcap_filesize, nsub):  # se bem que nao precisa dessa funcao, pois os temos os frames
-    """
-        Returns an estimate for the maximum possible number
-        of frame_info in the pcap file.
-
-        The size of the pcap file is divided by the size of
-        a packet to calculate the number of frame_info. However,
-        some packets have a padding of a few bytes, so the value
-        returned is slightly higher than the actual number of
-        frame_info in the pcap file.
-    """
-
-    # PCAP global header is 24 bytes
-    # PCAP packet header is 16 bytes
-    # Ethernet + IP + UDP headers are 42 bytes
-    # Nexmon metadata is 18 bytes
-    # CSI is nsub*4 bytes long
-    #
-    # So each packet is 12 + 46 + 18 + nsub*4 bytes long
-    nsamples_max = int(
-        (pcap_filesize - 24) / (
-            12 + 46 + 18 + (nsub*4)  ## modificar a conta retirando o 12 e 46 e 24
-        )
-    )
-
-    return nsamples_max
-
-
 def read_frame(frame, bandwidth=0, nsamples_max=1):
     """
         Reads CSI frame_info from
