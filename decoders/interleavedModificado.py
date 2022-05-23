@@ -226,12 +226,9 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
     # Pointer to current location in file.
     # This is faster than using file.tell()
     # =24 to skip pcap global header
-    ptr = 0  # nao temos global, packet, nem network info
+    ptr = 0  # nao temos global header, apenas packet header + nexmon metadata
 
     nsamples = 0
-
-    frame_len = len(frame) - 18
-
 ############################## essa é a parte que nos interessa ##################################
 
     # 4 bytes: Magic Bytes               @ 0 - 4
@@ -253,8 +250,8 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
     # Convert CSI bytes to numpy array
     csi_np = np.frombuffer(
         csi,
-        dtype = np.int16,
-        count = nsub * 2 * nsamples
+        dtype=np.int16,
+        count=nsub * 2 * nsamples
     )
 
     # Cast numpy 1-d array to matrix

@@ -1,16 +1,22 @@
+import time
+
 from plotters.AmpPhaPlotter import Plotter  # Amplitude and Phase plotter
 import decoders.interleavedModificado as decoder
 import socket
 
 
-# TCP_IP = input("Qual o IP do raspberry? ")
-TCP_IP = "192.168.0.4"
+TCP_IP = "192.168.0.3"
 TCP_PORT = 5501
-BUFFER_SIZE = 512*4 + 34  # 34 surge do NEXMON metadado + packet header
+BUFFER_SIZE = 512*4 + 18  # 34 surge do NEXMON metadado + packet header
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((TCP_IP, TCP_PORT))
-# s.send(MESSAGE)
+s.bind((TCP_IP, TCP_PORT))
+print("Waiting for connections...")
+s.listen(1)
+conn, addr = s.accept()
+print('Connected by', addr)
+print("\n\n")
+time.sleep(1)
 
 remove_null_subcarriers = False
 remove_pilot_subcarriers = False
@@ -21,20 +27,8 @@ plotter = Plotter(bandwidth)
 n_frame = 0
 while True:
     # recebendo os frames
-    frame = s.recv(BUFFER_SIZE)
-    if n_frame == 0:
-        print(frame[:16])
-        print(frame[16:34])
-        print(len(frame[34:34 + int(bandwidth * 3.2) * 4]))
-        print("\n")
-        n_frame += 1
-        continue
-    else:
-        print(frame)
-        #print(frame[50:68])
-        #print(len(frame[68:68 + int(bandwidth * 3.2) * 4]))
-        print("\n")
-        continue
+    frame = conn.recv(BUFFER_SIZE)
+
     # processando as informacoes do pacote CSI
     frame_info = decoder.read_frame(frame, bandwidth)
     frame_info.print(0, n_frame=n_frame)
