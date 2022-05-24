@@ -2,7 +2,7 @@ import socket
 import threading
 
 janela = 40
-buffer = [b'/x00'] * janela
+buffer = [0] * janela
 
 
 def listen_5500(array, janela_k):  # janela é o tamanho k de frames armazenados em um array/buffer

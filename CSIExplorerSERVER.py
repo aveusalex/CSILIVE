@@ -5,6 +5,10 @@ import decoders.interleavedModificado as decoder
 import socket
 
 
+remove_null_subcarriers = False
+remove_pilot_subcarriers = False
+bandwidth = int(input("Qual a largura de banda a ser usada? "))
+
 TCP_IP = "192.168.0.3"
 TCP_PORT = 5501
 BUFFER_SIZE = 512*4 + 18  # 34 surge do NEXMON metadado + packet header
@@ -17,10 +21,6 @@ conn, addr = s.accept()
 print('Connected by', addr)
 print("\n\n")
 time.sleep(1)
-
-remove_null_subcarriers = False
-remove_pilot_subcarriers = False
-bandwidth = 20
 
 plotter = Plotter(bandwidth)
 
