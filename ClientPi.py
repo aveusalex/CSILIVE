@@ -32,7 +32,7 @@ def listen_5500(janela_k):  # janela é o tamanho k de frames armazenados em um 
 
 
 # iniciando o thread do servidor Nexmon
-t = threading.Thread(target=listen_5500, args=[buffer, janela])
+t = threading.Thread(target=listen_5500, args=[janela])
 try:
     t.start()
     print("Servidor Nexmon iniciado. Escutando pacotes na porta 5500.")
