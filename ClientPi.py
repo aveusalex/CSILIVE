@@ -1,6 +1,5 @@
 import socket
 import threading
-from time import sleep
 
 janela = 1000
 buffer = [b'\x00'] * janela
@@ -30,7 +29,6 @@ def listen_5500(janela_k):  # janela é o tamanho k de frames armazenados em um 
         data, addr = sock.recvfrom(512 * 4 + 18)  # buffer size is 2048 + 18 bytes
         buffer[counter] = data
         counter += 1
-        sleep(0.01)
 
 
 # iniciando o thread do servidor Nexmon
@@ -49,6 +47,7 @@ try:
     server_pc.connect(('192.168.0.3', 5501))
 except ConnectionError:
     print("Não foi possível conectar ao computador. Verifique se o CSIExplorerSERVER está rodando.")
+    stop = True
     exit(-1)
 
 # contador auxiliar que serve como ponteiro para o buffer
@@ -62,7 +61,6 @@ while True and start and not stop:
     try:
         server_pc.send(data)
         counter += 1
-        sleep(0.01)
 
     except ConnectionError:
         decision = input("Servidor caiu. Reconectar? ([y]/n) ")
