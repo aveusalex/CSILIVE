@@ -18,7 +18,7 @@ def listen_5500(array, janela_k):  # janela é o tamanho k de frames armazenados
 
     counter = 0
     while True:
-        if counter > janela_k:
+        if counter >= janela_k:
             counter = 0
         # recebendo os frames (nexmon metadata + CSI data) (18 bytes + numero subcarriers * 4)
         data, addr = sock.recvfrom(512 * 4 + 18)  # buffer size is 2048 + 18 bytes
@@ -46,7 +46,7 @@ except ConnectionError:
 # contador auxiliar que serve como ponteiro para o buffer
 counter = 0
 while True:
-    if counter > janela:
+    if counter >= janela:
         counter = 0
     data = buffer[counter]
 
