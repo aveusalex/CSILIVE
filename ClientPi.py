@@ -3,13 +3,12 @@ import threading
 
 janela = 1000
 buffer = [b'\x00'] * janela
-start = False
 stop = False
 
 
 def listen_5500(janela_k):  # janela é o tamanho k de frames armazenados em um array/buffer
     # ouvindo o csi na porta 5500
-    global start, buffer
+    global buffer
     UDP_IP = "255.255.255.255"  # SEGUINDO O GITHUB DO NEXMON (SOURCE 10.10.10.10)
     UDP_PORT = 5500
 
@@ -19,16 +18,15 @@ def listen_5500(janela_k):  # janela é o tamanho k de frames armazenados em um 
 
     sock.bind((UDP_IP, UDP_PORT))
 
-    counter = 0
+    counter1 = 0
     while True and not stop:
-        if counter >= janela_k:
-            counter = 0
-        if counter == 5:
-            start = True
+        if counter1 >= janela_k:
+            counter1 = 0
+
         # recebendo os frames (nexmon metadata + CSI data) (18 bytes + numero subcarriers * 4)
         data, addr = sock.recvfrom(512 * 4 + 18)  # buffer size is 2048 + 18 bytes
-        buffer[counter] = data
-        counter += 1
+        buffer[counter1] = data
+        counter1 += 1
 
 
 # iniciando o thread do servidor Nexmon
@@ -52,14 +50,14 @@ except ConnectionError:
 
 # contador auxiliar que serve como ponteiro para o buffer
 counter = 0
-while True and start and not stop:
+while True and not stop:
     if counter >= janela:
         counter = 0
-    data = buffer[counter]
+    data2 = buffer[counter]
 
     # enviando os dados para o computador de destino
     try:
-        server_pc.send(data)
+        server_pc.send(data2)
         counter += 1
 
     except ConnectionError:
