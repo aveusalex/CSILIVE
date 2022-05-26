@@ -186,8 +186,6 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
     fc = frame[:18 + nsub*4]
     pcap_filesize = len(fc)
 
-    if nsamples_max == 0:
-        nsamples_max = __find_nsamples_max(pcap_filesize, nsub)
 
     # Preallocating memory  ## nao entendi pra que
     mac = bytearray(nsamples_max * 6)
