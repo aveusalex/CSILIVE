@@ -29,6 +29,9 @@ __all__ = [
 
 import numpy as np
 
+
+np.seterr(all="ignore")
+
 # Indexes of Null and Pilot OFDM subcarriers
 # https://www.oreilly.com/library/view/80211ac-a-survival/9781449357702/ch02.html
 nulls = {
@@ -218,11 +221,15 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
     nsamples += 1
 
     # Convert CSI bytes to numpy array
-    csi_np = np.frombuffer(
-        csi,
-        dtype=np.int16,
-        count=nsub * 2 * nsamples
-    )
+    try:
+        csi_np = np.frombuffer(
+            csi,
+            dtype=np.int16,
+            count=nsub * 2 * nsamples
+        )
+    except:
+        print("Buffer recebido menor do que o esperado...")
+        return -1
 
     # Cast numpy 1-d array to matrix
     csi_np = csi_np.reshape((nsamples, nsub * 2))

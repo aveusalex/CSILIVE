@@ -31,6 +31,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         # processando as informacoes do pacote CSI
         frame_info = decoder.read_frame(frame, bandwidth)
+        if frame_info == -1:
+            continue
+
         frame_info.print(0, n_frame=n_frame)
 
         # Lendo o CSI de fato
