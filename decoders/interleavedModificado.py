@@ -28,6 +28,8 @@ __all__ = [
 ]
 
 import numpy as np
+from numba import jit
+from statistics import variance
 
 
 np.seterr(all="ignore")
@@ -246,6 +248,60 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
          csi_cmplx),
         bandwidth
     )
+
+
+# A partir daqui estarão descritas funções de processamento dos sinais e filtragem.
+
+
+# @jit(nopython=True)
+# reference: https://towardsdatascience.com/outlier-detection-with-hampel-filter-85ddf523c73d
+def hampel_filter_forloop_numba(input_series, window_size, n_subport, n_sigmas=3):
+    new_series = input_series.copy()
+    k = 1.4826  # scale factor for Gaussian distribution
+    n = len(new_series[0, :])
+    for subportadora in range(n_subport):
+        amps_subportadora = new_series[subportadora, :]
+
+        for i in range(window_size, n - window_size):
+            x0 = np.nanmedian(amps_subportadora[i - window_size:i + window_size])
+            S0 = k * np.nanmedian(np.abs(amps_subportadora[i - window_size:i + window_size] - x0))
+            if np.abs(amps_subportadora[i] - x0) > n_sigmas * S0:
+                amps_subportadora[i] = x0
+
+        new_series[subportadora, :] = amps_subportadora
+
+    return new_series
+
+
+#@jit(nopython=True)
+def moving_average(input_series, window_size, n_subport):
+    mean_series = input_series.copy()
+    n = len(mean_series[0, :])
+    for subportadora in range(n_subport):
+        amps_subportadora = mean_series[subportadora, :]
+
+        for idx in range(n):
+            try:
+                mean = amps_subportadora[idx-window_size:idx].sum() / window_size
+            except:
+                mean = amps_subportadora[idx]
+
+            mean_series[subportadora, idx] = mean
+
+    return mean_series
+
+
+def busca_variancia(input_series, n_subport, k=10):
+    variancias_por_sub = {}
+
+    for subportadora in range(n_subport):
+        amps_subportadora = input_series[subportadora, :]
+        variancia = variance(amps_subportadora)
+        variancias_por_sub[variancia] = subportadora
+
+    variancias = variancias_por_sub.keys()
+    sorted(variancias)
+    return [variancias_por_sub[x] for x in list(variancias[:k])]
 
 
 if __name__ == "__main__":
