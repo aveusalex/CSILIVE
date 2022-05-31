@@ -260,31 +260,39 @@ def hampel_filter_forloop_numba(input_series, window_size, n_subport, n_sigmas=3
     k = 1.4826  # scale factor for Gaussian distribution
     n = len(new_series[0, :])
     for subportadora in range(n_subport):
-        amps_subportadora = new_series[subportadora, :]
+        amps_subportadora = new_series[subportadora, :].copy()
 
         for i in range(window_size, n - window_size):
             x0 = np.nanmedian(amps_subportadora[i - window_size:i + window_size])
             S0 = k * np.nanmedian(np.abs(amps_subportadora[i - window_size:i + window_size] - x0))
-            if np.abs(amps_subportadora[i] - x0) > n_sigmas * S0:
-                amps_subportadora[i] = x0
 
-        new_series[subportadora, :] = amps_subportadora
+            if i - window_size == 0:  # tanto os primeiros quantos os ultimos valores não estão sendo pegos
+                for j in range(window_size+1):
+                    if np.abs(amps_subportadora[j] - x0) > n_sigmas * S0:
+                        new_series[subportadora, j] = x0
+            elif i + window_size == n - 1:
+                for j in range(n - window_size, n):
+                    if np.abs(amps_subportadora[j] - x0) > n_sigmas * S0:
+                        new_series[subportadora, j] = x0
+            else:
+                if np.abs(amps_subportadora[i] - x0) > n_sigmas * S0:
+                    new_series[subportadora, i] = x0
 
     return new_series
 
 
-#@jit(nopython=True)
+# @jit(nopython=True)
 def moving_average(input_series, window_size, n_subport):
     mean_series = input_series.copy()
     n = len(mean_series[0, :])
     for subportadora in range(n_subport):
-        amps_subportadora = mean_series[subportadora, :]
+        amps_subportadora = mean_series[subportadora, :].copy()
 
         for idx in range(n):
-            try:
+            if idx - window_size >= 0:
                 mean = amps_subportadora[idx-window_size:idx].sum() / window_size
-            except:
-                mean = amps_subportadora[idx]
+            else:
+                mean = amps_subportadora[:idx+1].sum() / (idx+1)
 
             mean_series[subportadora, idx] = mean
 
@@ -299,9 +307,9 @@ def busca_variancia(input_series, n_subport, k=10):
         variancia = variance(amps_subportadora)
         variancias_por_sub[variancia] = subportadora
 
-    variancias = variancias_por_sub.keys()
-    sorted(variancias)
-    return [variancias_por_sub[x] for x in list(variancias[:k])]
+    variancias = list(variancias_por_sub.keys())
+    variancias = sorted(variancias, reverse=True)
+    return [variancias_por_sub[x] for x in variancias[:k]]
 
 
 if __name__ == "__main__":

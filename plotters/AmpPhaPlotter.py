@@ -29,7 +29,7 @@ class Plotter:
         self.smoothing = apply_smoothing
 
         self.tamanho_janela = 30
-        self.atualizacao = 10
+        self.atualizacao = 30
 
         self.janela_cheia = False  # nao mexer
         self.nsub = int(bandwidth * 3.2)
@@ -76,7 +76,7 @@ class Plotter:
             self.memoria_temporaria_frames[1, :, posicao] = fases  # forma de obter as fases
 
     def update(self, csi, sequencia):
-        if sequencia % self.atualizacao == 0:
+        if sequencia % self.atualizacao == 0 and self.janela_cheia:
             self.ax_amp.clear()
             self.ax_pha.clear()
 
@@ -90,7 +90,7 @@ class Plotter:
         if sequencia % self.tamanho_janela == 0 and sequencia != 0:
             self.janela_cheia = True
 
-        if sequencia % self.atualizacao == 0 and sequencia != 0:
+        if sequencia % self.atualizacao == 0 and sequencia != 0 and self.janela_cheia:
             amplitudes = self.memoria_temporaria_frames[0, :, :]
 
             if self.hampel:
@@ -100,7 +100,7 @@ class Plotter:
                 amplitudes = self.memoria_temporaria_frames[0, :, :]
 
             if self.smoothing:
-                self.memoria_temporaria_frames[0, :, :] = moving_average(amplitudes, n_subport=self.nsub, window_size=30)
+                self.memoria_temporaria_frames[0, :, :] = moving_average(amplitudes, n_subport=self.nsub, window_size=3)
                 amplitudes = self.memoria_temporaria_frames[0, :, :]
 
             subport_significativas = busca_variancia(amplitudes, self.nsub)
