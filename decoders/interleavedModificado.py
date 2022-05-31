@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 import numpy as np
-from numba import jit
+# from numba import jit
 from statistics import variance
 
 
@@ -39,22 +39,22 @@ np.seterr(all="ignore")
 nulls = {
     20: [x+32 for x in [
         -32, -31, -30, -29,
-              31,  30,  29,  0
+        31,  30,  29,  0
     ]],
 
     40: [x+64 for x in [
         -64, -63, -62, -61, -60, -59, -1, 
-              63,  62,  61,  60,  59,  1,  0
+        63,  62,  61,  60,  59,  1,  0
     ]],
 
     80: [x+128 for x in [
         -128, -127, -126, -125, -124, -123, -1,
-               127,  126,  125,  124,  123,  1,  0
+        127,  126,  125,  124,  123,  1,  0
     ]],
 
     160: [x+256 for x in [
         -256, -255, -254, -253, -252, -251, -129, -128, -127, -5, -4, -3, -2, -1,
-               255,  254,  253,  252,  251,  129,  128,  127,  5,  4,  3,  3,  1,  0 
+        255,  254,  253,  252,  251,  129,  128,  127,  5,  4,  3,  3,  1,  0
     ]]
 }
 
@@ -184,15 +184,11 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
         default, but you can also set them explicitly.
     """
 
-
-
     # Number of OFDM sub-carriers
     nsub = int(bandwidth * 3.2)
     fc = frame[:18 + nsub*4]
-    pcap_filesize = len(fc)
 
-
-    # Preallocating memory  ## nao entendi pra que
+    # Preallocating memory
     mac = bytearray(nsamples_max * 6)
     seq = bytearray(nsamples_max * 2)
     css = bytearray(nsamples_max * 2)
@@ -219,7 +215,7 @@ def read_frame(frame, bandwidth=0, nsamples_max=1):
     css[nsamples*2: (nsamples+1)*2] = fc[ptr+12: ptr+14]
     csi[nsamples*(nsub*4): (nsamples+1)*(nsub*4)] = fc[ptr+18: ptr+18 + nsub*4]
 
-    #ptr += (frame_len - 42)
+    # ptr += (frame_len - 42)
     nsamples += 1
 
     # Convert CSI bytes to numpy array
@@ -282,6 +278,7 @@ def hampel_filter_forloop_numba(input_series, window_size, n_subport, n_sigmas=3
 
 
 # @jit(nopython=True)
+# Inspired by https://towardsdatascience.com/moving-averages-in-python-16170e20f6c
 def moving_average(input_series, window_size, n_subport):
     mean_series = input_series.copy()
     n = len(mean_series[0, :])
@@ -299,7 +296,7 @@ def moving_average(input_series, window_size, n_subport):
     return mean_series
 
 
-def busca_variancia(input_series, n_subport, k=10):
+def busca_variancia(input_series, n_subport, k=12):
     variancias_por_sub = {}
 
     for subportadora in range(n_subport):

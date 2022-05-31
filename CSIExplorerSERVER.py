@@ -5,8 +5,8 @@ import decoders.interleavedModificado as decoder
 import socket
 
 
-remove_null_subcarriers = False
-remove_pilot_subcarriers = False
+remove_null_subcarriers = True
+remove_pilot_subcarriers = True
 bandwidth = int(input("Qual a largura de banda a ser usada? "))
 
 TCP_IP = "192.168.40.168"
@@ -22,7 +22,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("\n\n")
     time.sleep(1)
 
-    plotter = Plotter(bandwidth, apply_hampel=True, apply_smoothing=True)
+    plotter = Plotter(bandwidth, apply_hampel=False, apply_smoothing=False)
 
     n_frame = 0
     while True:

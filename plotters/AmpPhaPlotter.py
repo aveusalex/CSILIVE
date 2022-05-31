@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from decoders.interleavedModificado import hampel_filter_forloop_numba, moving_average, busca_variancia
+from time import time
 
 '''
 Amplitude and Phase plotter
@@ -27,14 +28,15 @@ class Plotter:
         self.bandwidth = bandwidth
         self.hampel = apply_hampel
         self.smoothing = apply_smoothing
+        self.start = time()
 
-        self.tamanho_janela = 30
-        self.atualizacao = 30
+        self.tamanho_janela = 100
+        self.atualizacao = 100
 
         self.janela_cheia = False  # nao mexer
         self.nsub = int(bandwidth * 3.2)
 
-        self.fig, axs = plt.subplots(2)
+        self.fig, axs = plt.subplots(2, figsize=(15, 10))
 
         self.ax_amp = axs[0]
         self.ax_pha = axs[1]
@@ -77,6 +79,7 @@ class Plotter:
 
     def update(self, csi, sequencia):
         if sequencia % self.atualizacao == 0 and self.janela_cheia:
+            duracao = time() - self.start
             self.ax_amp.clear()
             self.ax_pha.clear()
 
@@ -84,6 +87,8 @@ class Plotter:
             self.ax_amp.set_ylabel('Amplitude')
             self.ax_pha.set_ylabel('Phase')
             self.ax_pha.set_xlabel('Sequencia Subportadora')
+            self.fig.suptitle(f'Nexmon CSI Real Time Explorer - {duracao} s')
+            self.start = time()
 
         self.cascata(csi, sequencia)
 
@@ -100,7 +105,7 @@ class Plotter:
                 amplitudes = self.memoria_temporaria_frames[0, :, :]
 
             if self.smoothing:
-                self.memoria_temporaria_frames[0, :, :] = moving_average(amplitudes, n_subport=self.nsub, window_size=3)
+                self.memoria_temporaria_frames[0, :, :] = moving_average(amplitudes, n_subport=self.nsub, window_size=10)
                 amplitudes = self.memoria_temporaria_frames[0, :, :]
 
             subport_significativas = busca_variancia(amplitudes, self.nsub)
