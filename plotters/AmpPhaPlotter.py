@@ -22,6 +22,16 @@ __all__ = [
     'Plotter'
 ]
 
+class PlotAuxiliares:
+    def __init__(self):
+        self.fig, axs = plt.subplots(2, figsize=(10, 7))
+        self.fig.suptitle('Nexmon CSI Real Time Explorer')
+        plt.ion()
+        plt.show()
+
+    def update_auxiliar(self):
+        pass
+
 
 class Plotter:
     def __init__(self, bandwidth, apply_hampel: bool, apply_smoothing: bool):
