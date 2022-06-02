@@ -22,12 +22,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("\n\n")
     time.sleep(1)
 
-    plotter = Plotter(bandwidth, apply_hampel=False, apply_smoothing=False)
+    plotter = Plotter(bandwidth, apply_hampel=True, apply_smoothing=False)
 
     n_frame = 0
     while True:
         # recebendo os frames
         frame = conn.recv(BUFFER_SIZE)
+        if frame[:4] != b'\x11\x11\x11\x11':
+            continue
 
         # processando as informacoes do pacote CSI
         frame_info = decoder.read_frame(frame, bandwidth)

@@ -299,15 +299,13 @@ def moving_average(input_series, window_size, n_subport):
     return mean_series
 
 
-def busca_variancia(input_series, n_subport, plot=0, k=12):
+def busca_variancia(input_series, n_subport, k=12):
     variancias_por_sub = {}
 
     for subportadora in range(n_subport):
         amps_subportadora = input_series[subportadora, :]
         variancia = variance(amps_subportadora)
         variancias_por_sub[variancia] = subportadora
-
-
 
     variancias = list(variancias_por_sub.keys())
     variancias = sorted(variancias, reverse=True)
