@@ -17,7 +17,7 @@ Requires:
 4. Run csi-explorer: `python3 CSIExplorerSERVER.py`
 5. Run CSI client in your raspberry Pi: `python3 Clientpi.py`
 
-Null-subcarriers can be hidden, you can change this in the variables on the file.
+Null and pilot-subcarriers can be hidden, you can change this in the variables on the file.
 
 
 ## Original Authors
@@ -27,3 +27,6 @@ Null-subcarriers can be hidden, you can change this in the variables on the file
 
 ## Modifications by:
 * [@aveusalex](https://github.com/aveusalex) - Alex Echeverria
+
+## Original Repository
+* [CSI Explorer](https://github.com/nexmonster/nexmon_csi/tree/feature/python/utils/python)
