@@ -261,7 +261,7 @@ def hampel_filter_forloop_numba(input_series, window_size, n_subport, n_sigmas=3
     for subportadora in range(n_subport):
         amps_subportadora = new_series[subportadora, :].copy()
 
-        for i in range(window_size, n - window_size):
+        for i in range(window_size, n - window_size + 1):
             x0 = np.nanmedian(amps_subportadora[i - window_size:i + window_size])
             S0 = k * np.nanmedian(np.abs(amps_subportadora[i - window_size:i + window_size] - x0))
 
