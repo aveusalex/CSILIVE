@@ -131,6 +131,7 @@ class Plotter:
                         self.ax_amp.plot(range(self.tamanho_janela), amplitudes, label=str(subportadora))
 
                     if self._phase:
+                        np.unwrap(fases)
                         self.ax_pha.plot(range(self.tamanho_janela), fases, label=str(subportadora))
 
             except ValueError as err:
